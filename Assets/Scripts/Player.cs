@@ -25,6 +25,15 @@ public class Player : MonoBehaviour
     public float angleSpeedBase = 50;
     public float angleSpeedMultiplierDistance = 30;
 
+    public float accelerationZ = 10;
+    public float decelerationZ = 20;
+
+    public float speedZMin = 50;
+    public float speedZMax = 100;
+
+    public float speedXMax = 50;
+    public float speedYMax = 50;
+
     float targetAngleX;
     float targetAngleY;
 
@@ -37,17 +46,25 @@ public class Player : MonoBehaviour
     AudioSource leftShotSource;
     AudioSource rightShotSource;
 
+    float speedZ;
+
+    Starfield starfield;
+
     // Start is called before the first frame update
     void Start()
     {
         angleX = 0;
         angleY = 0;
 
+        speedZ = 0;
+
         leftShotRigid = leftShot.GetComponent<Rigidbody>();
         rightShotRigid = rightShot.GetComponent<Rigidbody>();
 
         leftShotSource = leftShotSound.GetComponent<AudioSource>();
         rightShotSource = rightShotSound.GetComponent<AudioSource>();
+
+        starfield = GameObject.FindWithTag("Starfield").GetComponent<Starfield>();
     }
 
     // Update is called once per frame
@@ -67,8 +84,19 @@ public class Player : MonoBehaviour
         angleX += (targetAngleX - angleX) / angleSpeedMultiplierDistance * angleSpeedBase * Time.deltaTime;
         angleY += (targetAngleY - angleY) / angleSpeedMultiplierDistance * angleSpeedBase * Time.deltaTime;
 
+        if(Input.GetKey(KeyCode.Space))
+        {
+            speedZ += accelerationZ * Time.deltaTime;
+            if(speedZ > speedZMax) { speedZ = speedZMax; }
+        }
+        else
+        {
+            speedZ -= decelerationZ * Time.deltaTime;
+            if (speedZ < speedZMin) { speedZ = speedZMin; }
+        }
 
-        if(Input.GetMouseButtonDown(0))
+
+        if (Input.GetMouseButtonDown(0))
         {
             leftShot.gameObject.SetActive(true);
             leftShotRigid.position = leftShotStartPoint.position;
@@ -96,6 +124,19 @@ public class Player : MonoBehaviour
         }
 
         pivot.localRotation = Quaternion.Euler(0, angleY, 0) * Quaternion.Euler(angleX, 0, 0);
+
+        starfield.SetCameraSpeedZ(speedZ);
+
+        Vector3 f = transform.forward;
+        Vector3 pf = pivot.forward;
+        Vector3 pfXZ = new Vector3(pf.x, 0, pf.z).normalized;
+        Vector3 pfYZ = new Vector3(0, pf.y, pf.z).normalized;
+
+        float horizontalFactor = 1 - Vector3.Dot(f, pfXZ);
+        float verticalFactor = 1 - Vector3.Dot(f, pfYZ);
+
+        starfield.SetCameraSpeedX(Mathf.Sign(pf.x) * speedXMax * horizontalFactor);
+        starfield.SetCameraSpeedY(Mathf.Sign(pf.y) * speedYMax * verticalFactor);
 
 
     }

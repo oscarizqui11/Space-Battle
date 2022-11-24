@@ -249,6 +249,12 @@ MonoBehaviour:
   angleYRange: 30
   angleSpeedBase: 50
   angleSpeedMultiplierDistance: 10
+  accelerationZ: 10
+  decelerationZ: 20
+  speedZMin: 50
+  speedZMax: 100
+  speedXMax: 50
+  speedYMax: 50
 --- !u!1 &270264015
 GameObject:
   m_ObjectHideFlags: 0
@@ -2604,7 +2610,7 @@ GameObject:
   - component: {fileID: 2097929393}
   m_Layer: 0
   m_Name: Starfield
-  m_TagString: Untagged
+  m_TagString: Starfield
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2649,21 +2655,25 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 32c1217f296391149a0d0e237efcecce, type: 2}
   shotMaterials: []
   explosionMaterials: []
-  randomSeed: 69
-  planetsMin: 30
-  planetsMax: 80
+  randomSeed: 98
+  planetsMin: 4
+  planetsMax: 10
   planetPosXMin: -4000
   planetPosYMin: -2000
   planetPosZMin: 500
   planetPosXMax: 4000
   planetPosYMax: 2000
-  planetPosZMax: 4000
+  planetPosZMax: 2000
   planetSizeXMin: 400
   planetSizeYMin: 400
   planetSizeZMin: 400
   planetSizeXMax: 500
   planetSizeYMax: 500
   planetSizeZMax: 500
+  ringsMin: 0
+  ringsMax: 4
+  ringsDistanceMax: 550
+  ringsDistanceMin: 850
 --- !u!4 &2097929394
 Transform:
   m_ObjectHideFlags: 0

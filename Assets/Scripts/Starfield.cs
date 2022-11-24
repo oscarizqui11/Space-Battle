@@ -2,6 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public readonly struct Ring
+{
+    public Ring(int p, float d)
+    {
+        planet = p;
+        distance = d;
+    }
+
+    public readonly int planet;
+    public readonly float distance;
+
+    public override string ToString() => $"({planet}, {distance})";
+}
+
 public class Starfield : MonoBehaviour
 {
     [Header("Models")]
@@ -46,6 +60,25 @@ public class Starfield : MonoBehaviour
     private int numPlanets;
     private float[,] planets;
 
+    [Header("Anillos")]
+
+    public int ringsMin;
+    public int ringsMax;
+    public float ringsDistanceMax;
+    public float ringsDistanceMin;
+
+    public List<Ring> rings = new List<Ring>();
+    //private float[] rings;
+
+    [Header("Camera")]
+
+    float cameraPosX;
+    float cameraPosY;
+    float cameraPosZ;
+
+    float cameraSpeedX;
+    float cameraSpeedY;
+    float cameraSpeedZ;
 
 
     // Start is called before the first frame update
@@ -65,8 +98,15 @@ public class Starfield : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        cameraPosX += cameraSpeedX * Time.deltaTime;
+        cameraPosY += cameraSpeedY * Time.deltaTime;
+        cameraPosZ += cameraSpeedZ * Time.deltaTime;
+
+        Matrix4x4 cameraMatrix = Matrix4x4.Translate(new Vector3(cameraPosX, cameraPosY, cameraPosZ));
+
         if(UnityEngine.Random.seed != randomSeed)
         {
+            Debug.Log("Aqui");
             RandomizePlanets();
         }
 
@@ -74,7 +114,7 @@ public class Starfield : MonoBehaviour
         {
             Vector3 position = new Vector3(planets[i, 0], planets[i, 1], planets[i, 2]);
 
-            DrawPlanet(Matrix4x4.Translate(position), i);
+            DrawPlanet(cameraMatrix.inverse * Matrix4x4.Translate(position), i);
         }
     }
 
@@ -92,7 +132,7 @@ public class Starfield : MonoBehaviour
 
         Graphics.DrawMesh(planet, system * Matrix4x4.Scale(scale), planetMaterials[0], 0);
     }
-
+    
     // Funciones auxiliares para simplificar
     // las llamadas al generador de números aleatorios
 
@@ -121,10 +161,33 @@ public class Starfield : MonoBehaviour
             planets[i, 3] = Random(planetSizeXMin, planetSizeXMax);
             planets[i, 4] = Random(planetSizeYMin, planetSizeYMax);
             planets[i, 5] = Random(planetSizeZMin, planetSizeZMax);
+
+            int planetRings = Random(ringsMin, ringsMax);
+
+            for(int j = 0; j < planetRings; j++)
+            {
+                Ring newRing = new Ring (i, Random(ringsDistanceMin, ringsDistanceMax));
+                //Debug.Log("Anillo: " + newRing.ToString());
+
+                rings.Add(newRing);
+            }
         }
 
-        Debug.Log("Numero de planetas: " + planets.Length / 6);
+        //Debug.Log(rings.Count);
 
+    }
+
+    public void SetCameraSpeedX(float x)
+    {
+        cameraSpeedX = x;
+    }
+    public void SetCameraSpeedY(float y)
+    {
+        cameraSpeedX = y;
+    }
+    public void SetCameraSpeedZ(float z)
+    {
+        cameraSpeedX = z;
     }
 
 }
